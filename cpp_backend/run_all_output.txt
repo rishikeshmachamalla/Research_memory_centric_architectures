@@ -1,0 +1,14 @@
+settings: simd=auto reps=15 stat=min cpu_pin=2
+== 1. correctness ==
+simd=scalar  : 4494 cases passed
+simd=avx2    : 4494 cases passed
+TOTAL pass=8988 fail=0 (skipped as unsupported shape/mask: 1284)
+== 2. primitives x levels x data size, 64 PEs, 1D (paper Figs. 14/16/18) ==
+== 3. number of PEs (paper Fig. 19) ==
+== 4. hypercube shapes / communication axes (paper Fig. 20) ==
+== 5. data types (paper Sec. VIII-F) ==
+== 6. [OUR ADDITION] SIMD flavour: scalar vs AVX2 vs AVX-512 ==
+   (avx512 not supported on this CPU - skipped)
+== 7. [OUR ADDITION] domain-agnostic reductions: OR/XOR need no domain transfer ==
+== 8. application: BFS (AllReduce with bitwise OR) ==
+done -> results/*.csv   (now: python3 scripts/plot.py)

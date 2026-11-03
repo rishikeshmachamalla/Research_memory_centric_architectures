@@ -1,0 +1,20 @@
+856 rows, 10 hypercube configs
+
+plain leave-one-config-out error of every candidate (optimistic: chosen on the same data):
+   +spillA(2048K)         mean  14.3%  median  10.4%
+   +spillA(1024K)         mean  14.3%  median  10.3%
+   +spillA(128K)          mean  14.5%  median  10.2%
+   +spillA(512K)          mean  14.6%  median  10.6%
+   +spillA(256K)          mean  14.6%  median  10.6%
+   base                   mean  14.6%  median  10.0%
+   +spillA(4096K)         mean  14.6%  median  10.0%
+   +spillB(4096K)         mean  14.6%  median  10.0%
+   base                   mean  14.6%  median  10.0%   <- current model
+
+NESTED (honest) held-out error:
+   with feature selection   mean  14.3%  median  10.4%  p90  34.6%
+   base model only          mean  14.6%  median  10.0%  p90  34.2%
+   candidates chosen per held-out config: {'+spillA(2048K)': 9, '+spillA(1024K)': 1}
+
+baseline rules over 224 level decisions: always L0: 28%, always L1: 5%, always L2: 0%, always L3: 67%
+base-model error by bytes per PE: 512B 12%, 2048B 12%, 8192B 14%, 32768B 21%

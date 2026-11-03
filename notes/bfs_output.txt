@@ -1,0 +1,28 @@
+BFS: V=16384, E=65532, reached 16380 vertices; all runs match the independent Python BFS
+
+ PEs level      rounds  measured ms  predicted ms    err     DTs
+   8 Base            8        0.034         0.043    26%    4096
+   8 +PR             8        0.076         0.079     3%    6400
+   8 +PR+IM          8        0.068         0.066     3%    6400
+   8 +PR+IM+CM       8        0.033         0.034     2%       0
+  16 Base            8        0.070         0.086    22%    8192
+  16 +PR             8        0.146         0.156     7%   12544
+  16 +PR+IM          8        0.127         0.130     2%   12544
+  16 +PR+IM+CM       8        0.064         0.067     6%       0
+  32 Base            8        0.168         0.172     2%   16384
+  32 +PR             8        0.328         0.310     6%   24832
+  32 +PR+IM          8        0.252         0.258     2%   24832
+  32 +PR+IM+CM       8        0.126         0.135     7%       0
+  64 Base            8        0.363         0.343     5%   32768
+  64 +PR             8        0.666         0.617     7%   49408
+  64 +PR+IM          8        0.515         0.515     0%   49408
+  64 +PR+IM+CM       8        0.250         0.269     8%       0
+
+communication speedup of the full design over the baseline (level 3 vs level 0):
+     8 PEs: measured  1.03x   predicted  1.28x
+    16 PEs: measured  1.11x   predicted  1.28x
+    32 PEs: measured  1.33x   predicted  1.28x
+    64 PEs: measured  1.45x   predicted  1.28x
+
+model error on BFS (never in training): mean 6.8%  median 5.5%  max 25.9%
+written to /home/rishi/research/pidcomm-sim/results/bfs

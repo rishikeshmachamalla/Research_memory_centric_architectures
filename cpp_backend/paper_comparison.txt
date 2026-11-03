@@ -1,0 +1,21 @@
+metric                                                    | paper (real HW)                        | ours (this laptop)
+---------------------------------------------------------------------------------------------------------------------------------------------------
+Fig.14  AlltoAll speedup (full vs base)                   | 5.19x                                  | 5.64x   [64 PEs, 65536 B/PE]
+Fig.14  ReduceScatter speedup                             | 4.46x                                  | 1.03x
+Fig.14  AllReduce speedup                                 | 4.23x                                  | 2.29x
+Fig.14  AllGather speedup                                 | (small; baseline already fast)         | 1.33x
+Fig.14  geomean of these 4 primitives                     | 2.83x (all 8 primitives)               | 2.05x   [not the same set of primitives]
+Fig.16  +PE-assisted reordering (geomean)                 | 1.48x                                  | 0.61x   [<1 means slower than base]
+Fig.16  +in-register modulation (additional)              | 2.03x                                  | 2.40x
+Fig.16  +cross-domain modulation (additional, AA/AG)      | 1.42x                                  | 1.78x
+Fig.18  speedup grows with data size                      | yes (2.89x geomean at 8 MB)            | 1.52x -> 2.05x   [512 B -> 65536 B per PE]
+Fig.19  speedup grows with #PEs                           | yes (64 -> 1024 PEs)                   | 1.04x -> 1.16x -> 1.57x -> 2.05x   [8 -> 64 PEs, 65536 B/PE; we cannot reach 1024 PEs]
+Sec.VIII-F  8-bit data benefits more (RS/AR)              | yes (cross-domain modulation applies)  | 1B:2.73x / 4B:1.46x / 8B:1.21x
+Fig.20  AlltoAll/AllReduce throughput ~flat across shapes | yes                                    | max/min = 2.02 (AA), 1.12 (AR)   [closer to 1.00 = flatter]
+Fig.20  ReduceScatter/AllGather vary with shape           | yes (grow with x-axis length)          | max/min = 1.40 (RS), 1.99 (AG)
+OURS  ReduceScatter: OR at level 3 vs sum at level 2      | n/a (paper: CM only non-arithmetic/8-bit) | 2.21x faster   [no domain transfer needed for bitwise ops]
+OURS  AllReduce: OR at level 3 vs sum at level 2          | n/a (paper: CM only non-arithmetic/8-bit) | 2.05x faster   [no domain transfer needed for bitwise ops]
+OURS  host SIMD flavour (full design, geomean time)       | AVX-512 only                           | avx2: 0.402 ms | scalar: 0.252 ms   [lower is faster]
+Fig.15  BFS speedup (we: communication only)              | 1.20x-3.99x over all 5 apps, end-to-end | 1.07x -> 1.10x -> 1.35x -> 1.48x   [8 -> 64 PEs; not end-to-end]
+
+saved /home/rishi/research/pidcomm-sim/cpp_backend/results/paper_comparison.json

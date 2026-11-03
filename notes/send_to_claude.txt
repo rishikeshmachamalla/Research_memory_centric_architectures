@@ -1,0 +1,309 @@
+measuring host runtimes (C++ backend)...
+  8 mask=1 dtype=4 op=sum: 76 rows
+  16 mask=1 dtype=4 op=sum: 76 rows
+  32 mask=1 dtype=4 op=sum: 76 rows
+  64 mask=1 dtype=4 op=sum: 76 rows
+  8x8 mask=10 dtype=4 op=sum: 76 rows
+  8x8 mask=01 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=4 op=sum: 76 rows
+  16x4 mask=10 dtype=4 op=sum: 76 rows
+  16x4 mask=11 dtype=4 op=sum: 76 rows
+  8x2x4 mask=101 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=1 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=or: 32 rows
+856 measurements
+[counts] formulas == C++ counters on 856/856 rows
+{
+  "counts_exact_rows": 856,
+  "rows": 856,
+  "coefficients_ms_per_event": {
+    "bus": 6.748849430354337e-07,
+    "dt": 5.4408388988442936e-06,
+    "mem": 1.3569010344783884e-06,
+    "rot": 3.1090068676277952e-06,
+    "perm": 3.465829893525664e-06,
+    "comb": 2.9622640633232953e-06,
+    "swords": 7.01775807878565e-07
+  },
+  "in_sample": {
+    "n": 856,
+    "mape": 0.1485453196302282,
+    "median_ape": 0.10095974240684656,
+    "p90_ape": 0.3235117032786736,
+    "r2_log": 0.978981292839302
+  },
+  "in_sample_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8035714285714286,
+    "mean_regret": 0.02383466151590084,
+    "max_regret": 0.2666666666666666
+  },
+  "leave_one_config_out": {
+    "n": 856,
+    "mape": 0.15439423257241797,
+    "median_ape": 0.10556624708303257,
+    "p90_ape": 0.393025017643268
+  },
+  "leave_one_config_out_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8035714285714286,
+    "max_regret": 0.2666666666666666
+  },
+  "size_extrapolation": {
+    "train_max_bytes": 2048,
+    "test_min_bytes": 8192,
+    "n": 428,
+    "mape": 0.1811783941184612,
+    "median_ape": 0.1291238035672917,
+    "p90_ape": 0.5312214285980122,
+    "r2_log": 0.9148941611690778
+  },
+  "speedup_L3_over_L0_leave_one_config_out": {
+    "n": 184,
+    "mean_rel_err": 0.26197711788906836
+  }
+}
+results written to results/run_scalar
+BFS: V=16384, E=65532, reached 16380 vertices; all runs match the independent Python BFS
+
+ PEs level      rounds  measured ms  predicted ms    err     DTs
+   8 Base            8        0.038         0.042    11%    4096
+   8 +PR             8        0.068         0.067     1%    6400
+   8 +PR+IM          8        0.051         0.056     9%    6400
+   8 +PR+IM+CM       8        0.019         0.021    11%       0
+  16 Base            8        0.075         0.084    12%    8192
+  16 +PR             8        0.132         0.134     2%   12544
+  16 +PR+IM          8        0.098         0.112    15%   12544
+  16 +PR+IM+CM       8        0.036         0.042    16%       0
+  32 Base            8        0.179         0.168     6%   16384
+  32 +PR             8        0.294         0.268     9%   24832
+  32 +PR+IM          8        0.195         0.224    15%   24832
+  32 +PR+IM+CM       8        0.074         0.086    16%       0
+  64 Base            8        0.386         0.337    13%   32768
+  64 +PR             8        0.613         0.535    13%   49408
+  64 +PR+IM          8        0.401         0.446    11%   49408
+  64 +PR+IM+CM       8        0.157         0.172    10%       0
+
+communication speedup of the full design over the baseline (level 3 vs level 0):
+     8 PEs: measured  2.03x   predicted  2.02x
+    16 PEs: measured  2.06x   predicted  1.99x
+    32 PEs: measured  2.41x   predicted  1.97x
+    64 PEs: measured  2.46x   predicted  1.96x
+
+model error on BFS (never in training): mean 10.5%  median 11.0%  max 16.4%
+written to results/run_scalar/bfs
+
+error by primitive
+  aa             n= 160  mean abs err  21.1%  median  13.7%
+  ag             n= 160  mean abs err  16.2%  median  13.5%
+  ar             n= 208  mean abs err  14.5%  median   8.7%
+  arnaive        n= 120  mean abs err   6.8%  median   4.3%
+  rs             n= 208  mean abs err  16.4%  median  12.0%
+
+error by level
+  0              n= 184  mean abs err  23.6%  median  22.0%
+  1              n= 224  mean abs err  21.1%  median  17.0%
+  2              n= 224  mean abs err   8.9%  median   9.2%
+  3              n= 224  mean abs err   9.6%  median   6.3%
+
+error by bytes per PE
+  512            n= 214  mean abs err  12.7%  median  10.6%
+  2048           n= 214  mean abs err  12.5%  median   9.5%
+  8192           n= 214  mean abs err  14.7%  median   9.9%
+  32768          n= 214  mean abs err  21.9%  median  13.1%
+
+error by host time bucket (ms)
+  <0.01          n= 199  mean abs err  12.7%  median   9.8%
+  <0.1           n= 323  mean abs err  12.5%  median   9.8%
+  <1             n= 286  mean abs err  14.1%  median   9.8%
+  >=1            n=  48  mean abs err  54.3%  median  53.8%
+
+level choice over 224 decisions:  model 80% correct
+   rule 'always level 0': 0% correct
+   rule 'always level 1': 19% correct
+   rule 'always level 2': 0% correct
+   rule 'always level 3': 80% correct
+
+8 worst predictions (out-of-sample):
+  aa       L1     64[1]  32768B dt=4 sum measured 1.6634 ms  predicted 0.6001 ms
+  aa       L1   16x4[10]  32768B dt=4 sum measured 1.6424 ms  predicted 0.6027 ms
+  aa       L1    8x8[01]  32768B dt=4 sum measured 1.6403 ms  predicted 0.6033 ms
+  ar       L0     64[1]  32768B dt=4 sum measured 1.7906 ms  predicted 0.6623 ms
+  ag       L1    8x8[01]  32768B dt=4 sum measured 1.6230 ms  predicted 0.6033 ms
+  ag       L1     64[1]  32768B dt=4 sum measured 1.6070 ms  predicted 0.6001 ms
+  aa       L1  8x2x4[101]  32768B dt=4 sum measured 1.6066 ms  predicted 0.6010 ms
+  ag       L1    8x8[11]  32768B dt=4 sum measured 1.6147 ms  predicted 0.6045 ms
+
+measurement noise floor: same configuration measured twice (reps=15, stat=min, cpu pin=2)
+   run-to-run difference: mean 2.2%  median 1.6%  worst 13.3%  (48 rows)
+   -> if this is close to the model's error, the error is mostly measurement noise, not the model.
+date: 2026-10-30T14:26:31+05:30
+simd: avx2  cpu pin: 2  reps: 15  stat: min
+Model name:                              13th Gen Intel(R) Core(TM) i7-1360P
+power profile: performance
+governor: powersave
+lines with avx512 in /proc/cpuinfo: 0
+metric                                                    | paper (real HW)                        | ours (this laptop)
+---------------------------------------------------------------------------------------------------------------------------------------------------
+Fig.14  AlltoAll speedup (full vs base)                   | 5.19x                                  | 10.81x   [64 PEs, 65536 B/PE]
+Fig.14  ReduceScatter speedup                             | 4.46x                                  | 1.43x
+Fig.14  AllReduce speedup                                 | 4.23x                                  | 3.62x
+Fig.14  AllGather speedup                                 | (small; baseline already fast)         | 2.78x
+Fig.14  geomean of these 4 primitives                     | 2.83x (all 8 primitives)               | 3.53x   [not the same set of primitives]
+Fig.16  +PE-assisted reordering (geomean)                 | 1.48x                                  | 0.67x   [<1 means slower than base]
+Fig.16  +in-register modulation (additional)              | 2.03x                                  | 2.43x
+Fig.16  +cross-domain modulation (additional, AA/AG)      | 1.42x                                  | 3.66x
+Fig.18  speedup grows with data size                      | yes (2.89x geomean at 8 MB)            | 2.66x -> 3.53x   [512 B -> 65536 B per PE]
+Fig.19  speedup grows with #PEs                           | yes (64 -> 1024 PEs)                   | 1.91x -> 2.00x -> 2.92x -> 3.66x   [8 -> 64 PEs, 65536 B/PE; we cannot reach 1024 PEs]
+Sec.VIII-F  8-bit data benefits more (RS/AR)              | yes (cross-domain modulation applies)  | 1B:5.86x / 4B:2.11x / 8B:1.85x
+Fig.20  AlltoAll/AllReduce throughput ~flat across shapes | yes                                    | max/min = 1.81 (AA), 1.13 (AR)   [closer to 1.00 = flatter]
+Fig.20  ReduceScatter/AllGather vary with shape           | yes (grow with x-axis length)          | max/min = 1.17 (RS), 1.21 (AG)
+OURS  ReduceScatter: OR at level 3 vs sum at level 2      | n/a (paper: CM only non-arithmetic/8-bit) | 3.24x  (>1 = faster)   [no domain transfer needed for bitwise ops]
+OURS  AllReduce: OR at level 3 vs sum at level 2          | n/a (paper: CM only non-arithmetic/8-bit) | 3.82x  (>1 = faster)   [no domain transfer needed for bitwise ops]
+OURS  host SIMD flavour (full design, geomean time)       | AVX-512 only                           | avx2: 0.348 ms | avx2-ptr: 0.490 ms | scalar: 0.281 ms   [lower is faster]
+OURS  avx2: loops compiled per ISA vs function pointers   | n/a                                    | 1.41x  (>1 = faster)   [fix for AVX kernels not beating scalar]
+OURS  avx2 (inlined) vs scalar                            | n/a                                    | 0.81x  (>1 = faster)
+Fig.15  BFS speedup (we: communication only)              | 1.20x-3.99x over all 5 apps, end-to-end | 2.85x -> 2.88x -> 3.34x -> 3.32x   [8 -> 64 PEs; not end-to-end]
+
+saved /home/rishi/research/pidcomm-sim/cpp_backend/results/paper_comparison.json
+measuring host runtimes (C++ backend)...
+  8 mask=1 dtype=4 op=sum: 76 rows
+  16 mask=1 dtype=4 op=sum: 76 rows
+  32 mask=1 dtype=4 op=sum: 76 rows
+  64 mask=1 dtype=4 op=sum: 76 rows
+  8x8 mask=10 dtype=4 op=sum: 76 rows
+  8x8 mask=01 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=4 op=sum: 76 rows
+  16x4 mask=10 dtype=4 op=sum: 76 rows
+  16x4 mask=11 dtype=4 op=sum: 76 rows
+  8x2x4 mask=101 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=1 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=or: 32 rows
+856 measurements
+[counts] formulas == C++ counters on 856/856 rows
+{
+  "counts_exact_rows": 856,
+  "rows": 856,
+  "coefficients_ms_per_event": {
+    "bus": 6.450279448259144e-08,
+    "dt": 8.16977174526409e-06,
+    "mem": 1.1235164634729921e-06,
+    "rot": 3.570254855393612e-06,
+    "perm": 0.0,
+    "comb": 0.0,
+    "swords": 4.0045243921627035e-07
+  },
+  "in_sample": {
+    "n": 856,
+    "mape": 0.14310321330039413,
+    "median_ape": 0.09874562807452944,
+    "p90_ape": 0.34423370406567566,
+    "r2_log": 0.9812430289481249
+  },
+  "in_sample_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8080357142857143,
+    "mean_regret": 0.027690091173611618,
+    "max_regret": 0.5887850467289721
+  },
+  "leave_one_config_out": {
+    "n": 856,
+    "mape": 0.1452359590750828,
+    "median_ape": 0.10210698841197931,
+    "p90_ape": 0.35022726395777565
+  },
+  "leave_one_config_out_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8080357142857143,
+    "max_regret": 0.5887850467289721
+  },
+  "size_extrapolation": {
+    "train_max_bytes": 2048,
+    "test_min_bytes": 8192,
+    "n": 428,
+    "mape": 0.17208368130432838,
+    "median_ape": 0.10469030917916174,
+    "p90_ape": 0.4873570325015664,
+    "r2_log": 0.9252028804763462
+  },
+  "speedup_L3_over_L0_leave_one_config_out": {
+    "n": 184,
+    "mean_rel_err": 0.21593089032707133
+  }
+}
+results written to results/run_avx2
+BFS: V=16384, E=65532, reached 16380 vertices; all runs match the independent Python BFS
+
+ PEs level      rounds  measured ms  predicted ms    err     DTs
+   8 Base            8        0.036         0.045    23%    4096
+   8 +PR             8        0.064         0.069     8%    6400
+   8 +PR+IM          8        0.058         0.060     3%    6400
+   8 +PR+IM+CM       8        0.014         0.015     6%       0
+  16 Base            8        0.073         0.090    22%    8192
+  16 +PR             8        0.132         0.136     3%   12544
+  16 +PR+IM          8        0.113         0.118     4%   12544
+  16 +PR+IM+CM       8        0.026         0.030    13%       0
+  32 Base            8        0.178         0.180     1%   16384
+  32 +PR             8        0.297         0.270     9%   24832
+  32 +PR+IM          8        0.226         0.233     3%   24832
+  32 +PR+IM+CM       8        0.053         0.060    12%       0
+  64 Base            8        0.391         0.359     8%   32768
+  64 +PR             8        0.611         0.538    12%   49408
+  64 +PR+IM          8        0.455         0.464     2%   49408
+  64 +PR+IM+CM       8        0.103         0.119    15%       0
+
+communication speedup of the full design over the baseline (level 3 vs level 0):
+     8 PEs: measured  2.61x   predicted  3.02x
+    16 PEs: measured  2.78x   predicted  3.02x
+    32 PEs: measured  3.33x   predicted  3.02x
+    64 PEs: measured  3.78x   predicted  3.02x
+
+model error on BFS (never in training): mean 9.1%  median 8.3%  max 23.0%
+written to results/run_avx2/bfs
+
+error by primitive
+  aa             n= 160  mean abs err  21.3%  median  13.2%
+  ag             n= 160  mean abs err  15.8%  median  13.3%
+  ar             n= 208  mean abs err  11.7%  median   6.7%
+  arnaive        n= 120  mean abs err   7.9%  median   4.7%
+  rs             n= 208  mean abs err  15.0%  median  12.2%
+
+error by level
+  0              n= 184  mean abs err  22.4%  median  19.4%
+  1              n= 224  mean abs err  19.0%  median  12.4%
+  2              n= 224  mean abs err  10.6%  median  10.1%
+  3              n= 224  mean abs err   7.5%  median   6.9%
+
+error by bytes per PE
+  512            n= 214  mean abs err  12.2%  median   9.6%
+  2048           n= 214  mean abs err  11.4%  median   8.8%
+  8192           n= 214  mean abs err  13.5%  median  10.0%
+  32768          n= 214  mean abs err  20.9%  median  12.8%
+
+error by host time bucket (ms)
+  <0.01          n= 207  mean abs err  13.3%  median  10.5%
+  <0.1           n= 315  mean abs err  10.8%  median   8.1%
+  <1             n= 286  mean abs err  13.1%  median  10.7%
+  >=1            n=  48  mean abs err  52.6%  median  50.2%
+
+level choice over 224 decisions:  model 81% correct
+   rule 'always level 0': 3% correct
+   rule 'always level 1': 16% correct
+   rule 'always level 2': 0% correct
+   rule 'always level 3': 81% correct
+
+8 worst predictions (out-of-sample):
+  aa       L1     64[1]  32768B dt=4 sum measured 1.6077 ms  predicted 0.6103 ms
+  aa       L1    8x8[11]  32768B dt=4 sum measured 1.6000 ms  predicted 0.6104 ms
+  aa       L1  8x2x4[101]  32768B dt=4 sum measured 1.6049 ms  predicted 0.6126 ms
+  aa       L1   16x4[10]  32768B dt=4 sum measured 1.5945 ms  predicted 0.6129 ms
+  aa       L1   16x4[11]  32768B dt=4 sum measured 1.5874 ms  predicted 0.6112 ms
+  ag       L1     64[1]  32768B dt=4 sum measured 1.5782 ms  predicted 0.6103 ms
+  aa       L1    8x8[01]  32768B dt=4 sum measured 1.5898 ms  predicted 0.6153 ms
+  ag       L1   16x4[10]  32768B dt=4 sum measured 1.5788 ms  predicted 0.6129 ms
+
+measurement noise floor: same configuration measured twice (reps=15, stat=min, cpu pin=2)
+   run-to-run difference: mean 2.7%  median 1.3%  worst 18.9%  (48 rows)
+   -> if this is close to the model's error, the error is mostly measurement noise, not the model.

@@ -1,0 +1,67 @@
+measuring host runtimes (C++ backend)...
+  8 mask=1 dtype=4 op=sum: 76 rows
+  16 mask=1 dtype=4 op=sum: 76 rows
+  32 mask=1 dtype=4 op=sum: 76 rows
+  64 mask=1 dtype=4 op=sum: 76 rows
+  8x8 mask=10 dtype=4 op=sum: 76 rows
+  8x8 mask=01 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=4 op=sum: 76 rows
+  16x4 mask=10 dtype=4 op=sum: 76 rows
+  16x4 mask=11 dtype=4 op=sum: 76 rows
+  8x2x4 mask=101 dtype=4 op=sum: 76 rows
+  8x8 mask=11 dtype=1 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=sum: 32 rows
+  8x8 mask=11 dtype=8 op=or: 32 rows
+856 measurements
+[counts] formulas == C++ counters on 856/856 rows
+{
+  "counts_exact_rows": 856,
+  "rows": 856,
+  "coefficients_ms_per_event": {
+    "bus": 0.0,
+    "dt": 7.609020433458657e-06,
+    "mem": 1.5666831220787632e-06,
+    "rot": 7.969757914402609e-06,
+    "perm": 0.0,
+    "comb": 5.037236109166468e-07,
+    "swords": 3.254737893257529e-07
+  },
+  "in_sample": {
+    "n": 856,
+    "mape": 0.14322045751307477,
+    "median_ape": 0.10113186009008522,
+    "p90_ape": 0.3322631169985225,
+    "r2_log": 0.9811090160169489
+  },
+  "in_sample_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8839285714285714,
+    "mean_regret": 0.039037255649966074,
+    "max_regret": 1.1920836642838233
+  },
+  "leave_one_config_out": {
+    "n": 856,
+    "mape": 0.14585222202293116,
+    "median_ape": 0.09987009988045323,
+    "p90_ape": 0.3421385292880308
+  },
+  "leave_one_config_out_level_choice": {
+    "decisions": 224,
+    "exact_match": 0.8839285714285714,
+    "max_regret": 1.1920836642838233
+  },
+  "size_extrapolation": {
+    "train_max_bytes": 2048,
+    "test_min_bytes": 8192,
+    "n": 428,
+    "mape": 0.1728666165333212,
+    "median_ape": 0.10072747107308005,
+    "p90_ape": 0.48894390321980946,
+    "r2_log": 0.9145406550744005
+  },
+  "speedup_L3_over_L0_leave_one_config_out": {
+    "n": 184,
+    "mean_rel_err": 0.23120966754795585
+  }
+}
+results written to /home/rishi/research/pidcomm-sim/results

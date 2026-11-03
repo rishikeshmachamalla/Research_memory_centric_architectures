@@ -1,0 +1,135 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs,array,graphicx,xcolor,amsmath}
+\usepackage[hyphens]{url}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.4em, itemsep=2pt, topsep=3pt}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\bfseries}{\thesubsection}{0.6em}{}
+\newcommand{\fig}[3]{% file, width, fallback label — \IfFileExists is a base-LaTeX kernel primitive
+  \IfFileExists{figures/#1}{\includegraphics[width=#2]{figures/#1}}%
+  {\fbox{\parbox{#2}{\centering\small\vspace{1.0cm}\textit{[figure not yet copied in: #3]}\vspace{1.0cm}}}}}
+\pagestyle{plain}
+
+\title{\vspace{-1.5em}Baseline Results\\\large PID-Comm Reproduction \textemdash\ Group 4}
+\author{Rishikesh Machamalla (230101060) \quad Aditya Mogili (230101065) \quad Roopesh Jarupula (230101048)}
+\date{CS5290 Memory-Centric Architectures --- Assignment 2}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\noindent\textbf{Scope of this document.} This covers the \emph{baseline} and \emph{main-technique} reproduction only (what the assignment calls ``implement the baseline... then the paper's main technique, and compare your trends with the paper's figures''), plus the BFS application used to validate it. Our three new additions (the cost model, the bitwise-reduction finding, and the AVX2 study) are reported separately in the Contribution Results document. Full methodology, every caveat, and the explanation for each disagreement are in the main report; this document presents only the resulting graphs and tables, as requested.
+
+\textbf{What ``baseline'' means here.} We implement the paper's conventional host-mediated path (\textbf{L0}) and its three optimizations applied incrementally: \textbf{L1} = +PE-assisted reordering, \textbf{L2} = +in-register modulation, \textbf{L3} = +cross-domain modulation (the full design), for four primitives: AlltoAll, ReduceScatter, AllGather, AllReduce. All numbers are \emph{host-side time of a software model} (Intel i7-1360P, pinned core, minimum of 15 repetitions, measurement noise 2.2\% mean) --- \emph{not} UPMEM hardware measurements. We could not run the authors' own implementation (it crashed on the available functional simulator), so these come from our independently-verified software model instead.
+
+\section{Correctness (underlying every number below)}
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}\toprule
+Check & Result & What it shows \\\midrule
+C++ correctness suite & 17{,}976 / 17{,}976 pass & Every primitive, level, shape, dtype, operator \\
+Python test suite & 334 pass, 2 skipped & Independent NumPy reference matches the C++ engine \\
+Fault-injection test & 37/200 fail when broken & The cross-check genuinely detects bugs (not vacuous) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Primary Comparison: Our Speedups vs.\ the Paper's}
+64 PEs, 64\,KiB/PE, 32-bit sums, scalar kernels (identical kernels at every level, so the algorithm is the only variable). This is the headline comparison --- analogue of the paper's Fig.~14 and Fig.~16.
+
+\begin{center}\small
+\begin{tabular}{@{}lcc@{}}\toprule
+Quantity (full design L3 vs.\ baseline L0) & Paper (1024 PEs, real HW) & Ours (64 PEs, software model) \\\midrule
+AlltoAll speedup & 5.19$\times$ & 9.53$\times$ \\
+ReduceScatter speedup & 4.46$\times$ & 1.38$\times$ \\
+AllReduce speedup & 4.23$\times$ & 3.32$\times$ \\
+AllGather speedup & --- & 2.39$\times$ \\
+\addlinespace
++PR step alone (geomean) & 1.48$\times$ & 0.67$\times$\textsuperscript{\dag} \\
++IM step, additional (geomean) & 2.03$\times$ & 2.46$\times$ \\
++CM step, additional, AA/AG (geomean) & 1.42$\times$ & 3.15$\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+{\small\textsuperscript{\dag} Below 1$\times$: PE-assisted reordering alone is \emph{slower} than the baseline in our model (host-side time excludes PE-side work; see report Sec.~IV).}
+
+\vspace{0.3cm}
+\fig{fig_ablation.png}{0.72\textwidth}{fig\_ablation.png --- host-side throughput by level, all 4 primitives}
+\begin{center}\small\textit{Figure 1. Ablation: host-side throughput at each implementation level (64 PEs, scalar kernels). From \texttt{cpp\_backend/results/fig\_ablation.png} after running \texttt{scripts/run\_all.sh}.}\end{center}
+
+\section{Sensitivity: Data Size}
+\textit{Note: only the smallest- and largest-size geomean values were captured in our summary comparison; the full 5-point sweep exists as a figure on the measurement machine (see note below).}
+\begin{center}\small
+\begin{tabular}{@{}lcc@{}}\toprule
+ & 512 B/PE & 65{,}536 B/PE \\\midrule
+Geomean speedup (L3 vs.\ L0, 4 primitives) & 2.49$\times$ & 3.19$\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Speedup grows with data size, matching the paper's Fig.~18 trend (paper: 2.89$\times$ geomean at 8\,MB, real hardware).
+
+\vspace{0.2cm}
+\fig{fig_datasize.png}{0.72\textwidth}{fig\_datasize.png --- speedup vs.\ data size, full 5-point sweep}
+\begin{center}\small\textit{Figure 2. Throughput vs.\ data size, all 4 primitives, L0 vs.\ L3. From \texttt{fig\_datasize.png}.}\end{center}
+
+\section{Sensitivity: Number of PEs}
+\textit{Note: only the 8-PE and 64-PE geomean values were captured in our summary comparison; the full 4-point sweep exists as a figure (see note below).}
+\begin{center}\small
+\begin{tabular}{@{}lcccc@{}}\toprule
+PEs & 8 & 16 & 32 & 64 \\\midrule
+Geomean speedup (L3 vs.\ L0, 4 primitives) & 1.79$\times$ & \textemdash & \textemdash & 3.23$\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Speedup grows with PE count (8$\to$64), matching the paper's Fig.~19 trend (paper: scales to 1024 PEs on real hardware; we are limited to 64).
+
+\vspace{0.2cm}
+\fig{fig_pe_sweep.png}{0.72\textwidth}{fig\_pe\_sweep.png --- speedup vs.\ \#PEs, full 4-point sweep}
+\begin{center}\small\textit{Figure 3. Speedup vs.\ number of PEs, all 4 primitives. From \texttt{fig\_pe\_sweep.png}.}\end{center}
+
+\section{Sensitivity: Element Width}
+\begin{center}\small
+\begin{tabular}{@{}lccc@{}}\toprule
+Element width & 8-bit & 32-bit & 64-bit \\\midrule
+ReduceScatter/AllReduce speedup (L3 vs.\ L2, geomean) & 2.88$\times$ & 2.13$\times$ & 1.86$\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Narrower (8-bit) data benefits most, because cross-domain modulation then applies to arithmetic reductions too --- matching the paper's claim (Sec.~VIII-F).
+
+\section{Sensitivity: Hypercube Shape}
+\begin{center}\small
+\begin{tabular}{@{}lcc@{}}\toprule
+Primitive & max/min throughput across shapes \\\midrule
+AlltoAll & 1.08 \quad {\small(nearly flat, as paper reports)}\\
+AllReduce & 1.20 \quad {\small(nearly flat, as paper reports)}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\fig{fig_shapes.png}{0.72\textwidth}{fig\_shapes.png --- throughput across hypercube shapes/masks}
+\begin{center}\small\textit{Figure 4. Throughput across different hypercube shapes/communication masks. From \texttt{fig\_shapes.png}.}\end{center}
+
+\section{Application Baseline: BFS}
+BFS partitions graph edges over PEs; each round every PE expands its local frontier, then \texttt{AllReduce(bitwise OR)} merges the global next frontier --- as in the paper. $V{=}16{,}384$, $E{=}65{,}532$, 8 rounds, 16{,}380 vertices reached. Correctness verified three independent ways (Python reference, C++ on identical graph files, plain queue BFS); all agree. Only the AllReduce communication is timed --- we make no end-to-end speedup claim.
+
+\begin{center}\small
+\begin{tabular}{@{}rccccc@{}}\toprule
+PEs & L0 (ms) & L1 (ms) & L2 (ms) & L3 (ms) & L0/L3 speedup \\\midrule
+8  & 0.038 & 0.068 & 0.051 & 0.019 & 2.03$\times$ \\
+16 & 0.075 & 0.132 & 0.098 & 0.036 & 2.06$\times$ \\
+32 & 0.179 & 0.294 & 0.195 & 0.074 & 2.41$\times$ \\
+64 & 0.386 & 0.613 & 0.401 & 0.157 & 2.46$\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+\fig{fig_bfs.png}{0.72\textwidth}{fig\_bfs.png --- BFS communication time vs.\ \#PEs}
+\begin{center}\small\textit{Figure 5. BFS host-side communication time by level and PE count. From \texttt{results/bfs/fig\_bfs.png} (produced by \texttt{scripts/run\_bfs.py}).}\end{center}
+
+\vspace{0.3cm}
+\noindent\rule{\textwidth}{0.4pt}\\[2pt]
+{\small\textit{All measurements are host-side timings of our software model on one laptop, not UPMEM hardware measurements. Where we differ from the paper (ReduceScatter/AllReduce magnitudes, PE-assisted-reordering-alone), the main report states this explicitly and gives (untested) hypotheses --- see Sec.~IV of \texttt{report.tex}.}}
+
+\end{document}
